@@ -75,28 +75,78 @@ public class SudokuGenerator {
 
     private static int[][] generatePuzzle(int[][] completeGrid, String difficulty) {
         int[][] puzzle = copyGrid(completeGrid);
-        int clues = getHints(difficulty);
+        int hints = getHints(difficulty);
 
-        Random random = new Random();
-        int cellsToRemove = SIZE * SIZE - clues;
-
-        while (cellsToRemove > 0) {
-            int row = random.nextInt(SIZE);
-            int col = random.nextInt(SIZE);
-
-            if (puzzle[row][col] != 0) {
-                puzzle[row][col] = 0;
-                cellsToRemove--;
+        List<int[]> cells = new ArrayList<>();
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                cells.add(new int[]{row, col});
             }
         }
+        Collections.shuffle(cells);
+        for (int[] cell : cells) {
+            if (countHints(puzzle) <= hints) break;
+            int row = cell[0], col = cell[1];
+            int temp = puzzle[row][col];
+            puzzle[row][col] = 0;
 
+            if (!UniqueSolution(puzzle)){
+                puzzle[row][col] = temp;
+            }
+        }
         return puzzle;
     }
+
+    private static boolean UniqueSolution(int[][] puzzle) {
+        int[][] copy = copyGrid(puzzle);
+        return countSolutions(copy) == 1;
+    }
+
+    private static int countSolutions(int[][] grid) {
+        return solver(grid, 0 , 0);
+    }
+
+    private static int solver(int[][] grid, int row, int col) {
+        if (row == SIZE) {
+            return 1;
+        }
+        if (col == SIZE) {
+            return solver(grid, row + 1, 0);
+        }
+        if (grid[row][col] != 0) {
+            return solver(grid, row, col + 1);
+        }
+        int count = 0;
+        for (int num = 1; num <= SIZE; num++) {
+            if (isSafe(grid, row, col, num)) {
+                grid[row][col] = num;
+                count += solver(grid, row, col + 1);
+                grid[row][col] = 0;
+                if (count > 1){
+                    return count;
+                }
+            }
+        }
+        return count;
+    }
+
+    private static int countHints(int[][] grid) {
+        int count = 0;
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (grid[i][j] != 0) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     private static int getHints(String difficulty) {
         return switch (difficulty.toLowerCase()) {
             case "easy" -> 40;
-            case "medium" -> 30;
-            case "hard" -> 20;
+            case "medium" -> 32;
+            case "hard" -> 25;
             default -> 30;
         };
     }
