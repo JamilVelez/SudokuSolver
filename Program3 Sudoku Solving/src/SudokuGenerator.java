@@ -1,4 +1,5 @@
-// https://stackoverflow.com/questions/6963922/java-sudoku-generatoreasiest-solution
+//https://stackoverflow.com/questions/6963922/java-sudoku-generatoreasiest-solution
+//Added generated Sudoku puzzles into SudokuPuzzles.txt
 import java.util.*;
 
 public class SudokuGenerator {
