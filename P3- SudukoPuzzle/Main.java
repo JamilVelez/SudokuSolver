@@ -3,38 +3,48 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        String filePath = "SudokuPuzzles.txt";
+        String filePath = "SudokuPuzzles.txt"; // Path to your puzzle file
 
         try {
             // Read Sudoku puzzles from file
             List<int[]> puzzles = readSudokuPuzzles(filePath);
 
+            // Loop through each puzzle
             for (int i = 0; i < puzzles.size(); i++) {
                 System.out.println("Puzzle " + (i + 1) + ":");
-                printPuzzle(puzzles.get(i));
+                printPuzzle(puzzles.get(i)); // Print the puzzle before solving
 
                 // Create a Sudoku graph for the puzzle
-                SudokuGraph graph = new SudokuGraph(9);
+                SudokuGraph graph = new SudokuGraph(9);  // 9x9 Sudoku grid
                 for (int j = 0; j < puzzles.get(i).length; j++) {
                     if (puzzles.get(i)[j] != 0) {
-                        graph.setValue(j, puzzles.get(i)[j]);
+                        graph.setValue(j, puzzles.get(i)[j]);  // Set fixed values (question boxes)
                     }
                 }
 
+                // Solve the puzzle with BFS
                 System.out.println("\nSolving with BFS...");
-                boolean solved = SudokuSolverBFS.solve(graph);
-
-                if (!solved) {
-                    System.out.println("No solution found for Puzzle " + (i + 1) + ".");
+                boolean solvedBFS = SudokuSolverBFS.solve(graph); // BFS solver
+                if (!solvedBFS) {
+                    System.out.println("No solution found using BFS for Puzzle " + (i + 1) + ".");
                 }
 
-                System.out.println();
+                // Solve the puzzle with DLS
+                System.out.println("\nSolving with DLS...");
+                int depthLimit = 81;  // Set a depth limit for DLS
+                boolean solvedDLS = SudokuSolverDLS.solve(graph, depthLimit); // DLS solver
+                if (!solvedDLS) {
+                    System.out.println("No solution found using DLS for Puzzle " + (i + 1) + ".");
+                }
+
+                System.out.println(); // Add a blank line between puzzles
             }
         } catch (IOException e) {
             System.err.println("Error reading Sudoku puzzles: " + e.getMessage());
         }
     }
 
+    // Method to read the Sudoku puzzles from the file
     private static List<int[]> readSudokuPuzzles(String filePath) throws IOException {
         List<int[]> puzzles = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -68,6 +78,7 @@ public class Main {
         return puzzles;
     }
 
+    // Helper method to convert List<Integer> to int[] (array)
     private static int[] convertToPuzzleArray(List<Integer> currentPuzzle) {
         int[] puzzleArray = new int[81];
         for (int i = 0; i < currentPuzzle.size(); i++) {
@@ -76,6 +87,7 @@ public class Main {
         return puzzleArray;
     }
 
+    // Method to print the Sudoku puzzle in a readable format
     private static void printPuzzle(int[] puzzle) {
         for (int i = 0; i < puzzle.length; i++) {
             System.out.print((puzzle[i] == 0 ? "." : puzzle[i]) + " ");
