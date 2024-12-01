@@ -1,3 +1,9 @@
+// Graph to Solve Suduko
+// Why use this? Because it can easily model the relationship between nodes
+// Keep track of valid possible values and update dynamically as assigning values
+// Apply graph traversal algorithms (BFS or DLS) to search for solutions 
+
+
 import java.util.*;
 
 public class SudokuGraph {
