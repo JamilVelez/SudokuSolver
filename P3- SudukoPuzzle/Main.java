@@ -30,7 +30,7 @@ public class Main {
                 if (!solvedBFS) {
                     System.out.println("No solution found using BFS for Puzzle " + (i + 1) + ".");
                 }
-                System.out.printf("BFS Time: %d ns\n", (bfsEnd - bfsStart));
+                System.out.printf("BFS Time: %d ns (%.2f ms)\n", (bfsEnd - bfsStart), (bfsEnd - bfsStart) / 1e6);
 
                 // Solve the puzzle with DLS
                 System.out.println("\nSolving with DLS...");
@@ -41,7 +41,7 @@ public class Main {
                 if (!solvedDLS) {
                     System.out.println("No solution found using DLS for Puzzle " + (i + 1) + ".");
                 }
-                System.out.printf("DLS Time: %d ns\n", (dlsEnd - dlsStart));
+                System.out.printf("DLS Time: %d ns (%.2f ms)\n", (dlsEnd - dlsStart), (dlsEnd - dlsStart) / 1e6);
                 System.out.println(); // Add a blank line between puzzles
             }
         } catch (IOException e) {
