@@ -5,6 +5,7 @@ public class SudokuSolverDLS {
     public static boolean solve(SudokuGraph graph, int depthLimit) {
         // Start the search at the root node (empty board)
         int[] initialBoard = new int[81];  // Empty board (0 represents empty cells)
+
         
         return depthLimitedSearch(graph, initialBoard, 0, depthLimit);
     }
@@ -16,23 +17,30 @@ public class SudokuSolverDLS {
         }
     
         // If the board is solved (all cells are filled), return true
-        if (isSolved(board)) {
+        if (isSolved(graph, board)) {
             printBoard(board); // Print the solution
             return true;
         }
     
         // Find the next empty cell (answer box)
-        int emptyCell = findNextEmptyCell(board);
+        int emptyCell = findNextEmptyCell(board, graph);
         
         // If there are no empty cells, the board is complete
         if (emptyCell == -1) {
             return true;  // All cells are filled
+        }
+
+        if (graph.getPossibleValues(emptyCell).size() == 1) {
+            //System.out.println("Skipping pre-filled cell at index " + emptyCell);
+            board[emptyCell] = graph.getPossibleValues(emptyCell).iterator().next();
+            return depthLimitedSearch(graph, board, depth + 1, depthLimit);
         }
     
         // Try placing values (1-9) in the empty cell
         for (int value = 1; value <= 9; value++) {
             if (isValidMove(graph, board, emptyCell, value)) {
                 board[emptyCell] = value;  // Place the value in the empty cell
+                //System.out.println("Placing value " + value + " at cell " + emptyCell);
                 
                 // Recursively explore the next level with the updated board
                 if (depthLimitedSearch(graph, board, depth + 1, depthLimit)) {
@@ -41,6 +49,7 @@ public class SudokuSolverDLS {
     
                 // If no valid solution, backtrack: reset the cell and try the next value
                 board[emptyCell] = 0;
+                //System.out.println("Backtracking: Reset cell " + emptyCell);
             }
         }
     
@@ -48,20 +57,28 @@ public class SudokuSolverDLS {
         return false;
     }
 
-    private static boolean isSolved(int[] board) {
+    private static boolean isSolved(SudokuGraph graph, int[] board) {
         // Check if all cells are filled (no empty cells remaining)
-        for (int cell : board) {
-            if (cell == 0) return false;
+        for (int i = 0; i < board.length; i++) {
+            if (board[i] == 0) return false;
+            if(!isValidMove(graph, board, i, board[i])) return false;
         }
         return true; // All cells are filled
     }
 
-    private static int findNextEmptyCell(int[] board) {
-        // Find the first empty cell (represented by 0)
+    private static int findNextEmptyCell(int[] board, SudokuGraph graph) {
+        int bestCell = -1;
+        int minOptions = 10;
         for (int i = 0; i < board.length; i++) {
-            if (board[i] == 0) return i;
+            if (board[i] == 0) {
+                int options = graph.getPossibleValues(i).size();
+                if (options < minOptions) {
+                    minOptions = options;
+                    bestCell = i;
+                }
+            }
         }
-        return -1;  // No empty cells found
+        return bestCell;
     }
 
     private static boolean isValidMove(SudokuGraph graph, int[] board, int cell, int value) {

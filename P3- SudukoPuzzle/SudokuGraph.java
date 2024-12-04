@@ -57,6 +57,10 @@ public class SudokuGraph {
     public void setValue(int node, int value) {
         possibleValues.get(node).clear();
         possibleValues.get(node).add(value);
+
+        for (int neighbor : adjacencyList.get(node)) {
+            possibleValues.get(neighbor).remove(value);
+        }
     }
 
     public void resetValue(int node) {
