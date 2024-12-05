@@ -62,7 +62,7 @@ public class SudokuSolverBFS {
 
     private static boolean isValidMove(SudokuGraph graph, int[] board, int cell, int value) {
         // Check if placing the value in the given cell violates Sudoku constraints
-        for (int neighbor : graph.getNeighbors(cell)) {
+        for (int neighbor : graph.getRelatedCells(cell)) {
             if (board[neighbor] == value) return false; // Invalid move if there's a conflict
         }
         return true; // If no conflict, the move is valid
