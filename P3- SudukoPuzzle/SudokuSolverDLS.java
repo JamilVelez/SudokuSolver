@@ -4,7 +4,7 @@ public class SudokuSolverDLS {
 
     public static List<int[]> solve(SudokuGraph graph, int depthLimit) {
         List<int[]> solutions = new ArrayList<>();
-        int[] initialBoard = new int[81];  // Empty board (0 represents empty cells)
+        int[] initialBoard = new int[graph.getSize() * graph.getSize()];  // Empty board (0 represents empty cells)
 
         depthLimitedSearch(graph, initialBoard, 0, depthLimit, solutions);
         return solutions;
@@ -70,7 +70,7 @@ public class SudokuSolverDLS {
 
     private static boolean isValidMove(SudokuGraph graph, int[] board, int cell, int value) {
         // Check if placing the value in the given cell violates Sudoku constraints
-        for (int neighbor : graph.getNeighbors(cell)) {
+        for (int neighbor : graph.getRelatedCells(cell)) {
             if (board[neighbor] == value) return false; // Invalid move if there's a conflict
         }
         return true; // Valid move
