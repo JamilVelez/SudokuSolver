@@ -3,7 +3,8 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        String filePath = "SudokuPuzzles.txt"; // Path to your puzzle file
+        String filePath = "BigPuzzle.txt"; // Path to your puzzle file
+        //String filePath = "SudokuPuzzles.txt"; // Path to your puzzle file
 
         try {
             // Read Sudoku puzzles from file
@@ -14,52 +15,31 @@ public class Main {
                 System.out.println("Puzzle " + (i + 1) + ":");
                 printPuzzle(puzzles.get(i)); // Print the puzzle before solving
 
-                int size = (int) Math.sqrt(puzzles.get(i).length); // Calculate grid size (Dynamically)
+                // Dynamically calculate the grid size based on puzzle length
+                int gridSize = (int) Math.sqrt(puzzles.get(i).length); // Ensure this is a perfect square
+                System.out.println("Grid size: " + gridSize + "x" + gridSize);
 
                 // Create a Sudoku graph for the puzzle
-                SudokuGraph graph = new SudokuGraph(size);  // Create graph for variable grid sizes
+                SudokuGraph graph = new SudokuGraph(gridSize);  // Create graph for variable grid sizes
                 
-                for (int j = 0; j < puzzles.get(i).length; j++) {
-                    if (puzzles.get(i)[j] != 0) {
-                        graph.setValue(j, puzzles.get(i)[j]);  // Set fixed values (question boxes)
-                    }
-                }
+                // Set the initial puzzle values in the graph
+                graph.setBoardState(puzzles.get(i)); // Set the board state using setBoardState
 
                 // Solve the puzzle with BFS
-                System.out.println("\nSolving with BFS...");
+                System.out.println("\n>>>> Solving with BFS...");
                 long bfsStart = System.nanoTime();
                 List<int[]> bfsSolutions = SudokuSolverBFS.solve(graph); // BFS solver
                 long bfsEnd = System.nanoTime();
-                if (bfsSolutions.isEmpty()) {
-                    System.out.println("No solutions found using BFS for Puzzle " + (i + 1) + ".");
-                } else {
-                    System.out.println("Solutions found using BFS:");
-                    for (int[] solution : bfsSolutions) {
-                        printPuzzle(solution);
-                        System.out.println(); // Add a blank line between solutions
-                    }
-                }
-                System.out.printf("BFS Time: %d ns (%.2f ms)\n", (bfsEnd - bfsStart), (bfsEnd - bfsStart) / 1e6);
+                printSolutions("BFS", bfsSolutions, bfsEnd - bfsStart);
 
                 // Solve the puzzle with DLS
-                System.out.println("\nSolving with DLS...");
-                
-                // Dynamically calculate the depth limit based on grid size
-                int depthLimit = size * size;  // size is the grid size (e.g., 9 for 9x9, 4 for 4x4, etc.)
-                
+                System.out.println("\n>>>> Solving with DLS...");
+                int depthLimit = gridSize * gridSize;  // Set the depth limit based on grid size
                 long dlsStart = System.nanoTime();
                 List<int[]> dlsSolutions = SudokuSolverDLS.solve(graph, depthLimit); // DLS solver
                 long dlsEnd = System.nanoTime();
-                if (dlsSolutions.isEmpty()) {
-                    System.out.println("No solutions found using DLS for Puzzle " + (i + 1) + ".");
-                } else {
-                    System.out.println("Solutions found using DLS:");
-                    for (int[] solution : dlsSolutions) {
-                        printPuzzle(solution);
-                        System.out.println(); // Add a blank line between solutions
-                    }
-                }
-                System.out.printf("DLS Time: %d ns (%.2f ms)\n", (dlsEnd - dlsStart), (dlsEnd - dlsStart) / 1e6);
+                printSolutions("DLS", dlsSolutions, dlsEnd - dlsStart);
+
                 System.out.println(); // Add a blank line between puzzles
             }
         } catch (IOException e) {
@@ -73,26 +53,34 @@ public class Main {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             List<Integer> currentPuzzle = new ArrayList<>();
-
+    
             while ((line = br.readLine()) != null) {
-                line = line.trim();
+                line = line.trim(); // Remove any leading or trailing whitespace
                 if (line.isEmpty()) {
                     if (!currentPuzzle.isEmpty()) {
+                        // Convert the List<Integer> to an int[] and add it to puzzles list
                         puzzles.add(convertToPuzzleArray(currentPuzzle));
-                        currentPuzzle.clear();
+                        currentPuzzle.clear(); // Clear the list for the next puzzle
                     }
                 } else {
+                    // Split the line into individual parts (numbers or ".")
                     String[] parts = line.split(" ");
                     for (String part : parts) {
                         if (part.equals(".")) {
-                            currentPuzzle.add(0); // Represent empty cells as 0
+                            // Represent empty cells as 0
+                            currentPuzzle.add(0);
                         } else {
-                            currentPuzzle.add(Integer.parseInt(part));
+                            try {
+                                // Parse the number and add it to the current puzzle
+                                currentPuzzle.add(Integer.parseInt(part));
+                            } catch (NumberFormatException e) {
+                                System.err.println("Invalid number format: " + part);
+                            }
                         }
                     }
                 }
             }
-
+    
             // Add the last puzzle if it wasn't followed by a blank line
             if (!currentPuzzle.isEmpty()) {
                 puzzles.add(convertToPuzzleArray(currentPuzzle));
@@ -110,9 +98,24 @@ public class Main {
         return puzzleArray;
     }
 
+    // Method to print Sudoku solutions
+    private static void printSolutions(String method, List<int[]> solutions, long time) {
+        System.out.println(">>> Solutions found using " + method + ":");
+        if (solutions.isEmpty()) {
+            System.out.println("No solutions found.");
+        } else {
+            for (int idx = 0; idx < solutions.size(); idx++) {
+                System.out.println("Solution " + (idx + 1) + ":");
+                printPuzzle(solutions.get(idx));
+                System.out.println();
+            }
+        }
+        System.out.printf("%s Time: %.2f ms\n\n", method, time / 1e6);
+    }
+
     // Method to print the Sudoku puzzle in a readable format
     private static void printPuzzle(int[] puzzle) {
-        int size = (int) Math.sqrt(puzzle.length); // Calculate grid size (dynamically)
+        int size = (int) Math.sqrt(puzzle.length); // Calculate grid size dynamically
         for (int i = 0; i < puzzle.length; i++) {
             System.out.print((puzzle[i] == 0 ? "." : puzzle[i]) + " ");
             if ((i + 1) % size == 0) System.out.println();
