@@ -2,9 +2,10 @@ import java.util.*;
 
 public class SudokuSolverBFS {
 
-    public static boolean solve(SudokuGraph graph) {
+    public static List<int[]> solve(SudokuGraph graph) {
         Queue<int[]> queue = new LinkedList<>();
         Set<String> visited = new HashSet<>(); // To track visited board states
+        List<int[]> solutions = new ArrayList<>(); // To store all valid solutions
         
         int[] initialBoard = new int[81]; // Start with an empty board (0s for empty cells)
         
@@ -14,20 +15,15 @@ public class SudokuSolverBFS {
         while (!queue.isEmpty()) {
             int[] board = queue.poll(); // Get the next board state to process
             
-            // If the board is complete (all cells filled), return the solution
+            // If the board is complete (all cells filled), add it to solutions
             if (isSolved(board)) {
-                printBoard(board); // Print the solution board
-                return true;
+                solutions.add(board.clone()); // Add a clone to the solutions list
+                continue;
             }
 
             // Find the first empty cell (answer box)
             int emptyCell = findNextEmptyCell(board);
             
-            // If the empty cell is a "question box" (pre-filled), continue to the next cell
-            if (emptyCell == -1) {
-                continue;
-            }
-
             // Try all possible values for this empty cell
             for (int value : graph.getPossibleValues(emptyCell)) {
                 if (isValidMove(graph, board, emptyCell, value)) {
@@ -44,8 +40,8 @@ public class SudokuSolverBFS {
                 }
             }
         }
-        
-        return false; // If no solution is found
+
+        return solutions; // Return all solutions found
     }
 
     private static boolean isSolved(int[] board) {
@@ -68,13 +64,5 @@ public class SudokuSolverBFS {
             if (board[neighbor] == value) return false; // Invalid move if there's a conflict
         }
         return true; // If no conflict, the move is valid
-    }
-
-    private static void printBoard(int[] board) {
-        for (int i = 0; i < board.length; i++) {
-            System.out.print((board[i] == 0 ? "." : board[i]) + " ");
-            if ((i + 1) % 9 == 0) System.out.println(); // New line after each row
-        }
-        System.out.println(); // Extra line for spacing
     }
 }

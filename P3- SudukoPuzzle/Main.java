@@ -14,8 +14,11 @@ public class Main {
                 System.out.println("Puzzle " + (i + 1) + ":");
                 printPuzzle(puzzles.get(i)); // Print the puzzle before solving
 
+                int size = (int) Math.sqrt(puzzles.get(i).length); //calculate grid size (Dynamically)
+
                 // Create a Sudoku graph for the puzzle
-                SudokuGraph graph = new SudokuGraph(9);  // 9x9 Sudoku grid
+                SudokuGraph graph = new SudokuGraph(size);  //create graph for variable grid sizes
+                
                 for (int j = 0; j < puzzles.get(i).length; j++) {
                     if (puzzles.get(i)[j] != 0) {
                         graph.setValue(j, puzzles.get(i)[j]);  // Set fixed values (question boxes)
@@ -25,10 +28,16 @@ public class Main {
                 // Solve the puzzle with BFS
                 System.out.println("\nSolving with BFS...");
                 long bfsStart = System.nanoTime();
-                boolean solvedBFS = SudokuSolverBFS.solve(graph); // BFS solver
+                List<int[]> bfsSolutions = SudokuSolverBFS.solve(graph); // BFS solver
                 long bfsEnd = System.nanoTime();
-                if (!solvedBFS) {
-                    System.out.println("No solution found using BFS for Puzzle " + (i + 1) + ".");
+                if (bfsSolutions.isEmpty()) {
+                    System.out.println("No solutions found using BFS for Puzzle " + (i + 1) + ".");
+                } else {
+                    System.out.println("Solutions found using BFS:");
+                    for (int[] solution : bfsSolutions) {
+                        printPuzzle(solution);
+                        System.out.println(); // Add a blank line between solutions
+                    }
                 }
                 System.out.printf("BFS Time: %d ns (%.2f ms)\n", (bfsEnd - bfsStart), (bfsEnd - bfsStart) / 1e6);
 
@@ -36,10 +45,16 @@ public class Main {
                 System.out.println("\nSolving with DLS...");
                 int depthLimit = 81;  // Set a depth limit for DLS
                 long dlsStart = System.nanoTime();
-                boolean solvedDLS = SudokuSolverDLS.solve(graph, depthLimit); // DLS solver
+                List<int[]> dlsSolutions = SudokuSolverDLS.solve(graph, depthLimit); // DLS solver
                 long dlsEnd = System.nanoTime();
-                if (!solvedDLS) {
-                    System.out.println("No solution found using DLS for Puzzle " + (i + 1) + ".");
+                if (dlsSolutions.isEmpty()) {
+                    System.out.println("No solutions found using DLS for Puzzle " + (i + 1) + ".");
+                } else {
+                    System.out.println("Solutions found using DLS:");
+                    for (int[] solution : dlsSolutions) {
+                        printPuzzle(solution);
+                        System.out.println(); // Add a blank line between solutions
+                    }
                 }
                 System.out.printf("DLS Time: %d ns (%.2f ms)\n", (dlsEnd - dlsStart), (dlsEnd - dlsStart) / 1e6);
                 System.out.println(); // Add a blank line between puzzles
@@ -85,7 +100,7 @@ public class Main {
 
     // Helper method to convert List<Integer> to int[] (array)
     private static int[] convertToPuzzleArray(List<Integer> currentPuzzle) {
-        int[] puzzleArray = new int[81];
+        int[] puzzleArray = new int[currentPuzzle.size()];
         for (int i = 0; i < currentPuzzle.size(); i++) {
             puzzleArray[i] = currentPuzzle.get(i);
         }
@@ -94,9 +109,10 @@ public class Main {
 
     // Method to print the Sudoku puzzle in a readable format
     private static void printPuzzle(int[] puzzle) {
+        int size = (int) Math.sqrt(puzzle.length); //calculate grid size(dynamically)
         for (int i = 0; i < puzzle.length; i++) {
             System.out.print((puzzle[i] == 0 ? "." : puzzle[i]) + " ");
-            if ((i + 1) % 9 == 0) System.out.println();
+            if ((i + 1) % size == 0) System.out.println();
         }
     }
 }

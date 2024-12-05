@@ -22,7 +22,11 @@ public class SudokuGraph {
         // Initialize nodes and their connections
         for (int i = 0; i < size * size; i++) {
             adjacencyList.put(i, new HashSet<>());
-            possibleValues.put(i, new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)));
+            possibleValues.put(i, new HashSet<>());
+            for (int val= 1; val<= size; val++) {
+                possibleValues.get(i).add(val); //all values are possible (initially)
+            
+            }
         }
 
         // Create edges based on Sudoku rules
@@ -35,10 +39,11 @@ public class SudokuGraph {
                 if (j != row) adjacencyList.get(i).add(j * size + col); // Same column
             }
 
-            // Same 3x3 sub-grid
-            int startRow = (row / 3) * 3, startCol = (col / 3) * 3;
-            for (int r = startRow; r < startRow + 3; r++) {
-                for (int c = startCol; c < startCol + 3; c++) {
+            // Same sub-grid (sqrt(size)xsqrt(size))
+            int subGridSize = (int) Math.sqrt(size);
+            int startRow= (row / subGridSize) * subGridSize, startCol = (col / subGridSize) *subGridSize;
+            for (int r = startRow; r < startRow + subGridSize; r++) {
+                for (int c = startCol; c < startCol + subGridSize; c++) {
                     int node = r * size + c;
                     if (node != i) adjacencyList.get(i).add(node);
                 }
@@ -64,6 +69,12 @@ public class SudokuGraph {
     }
 
     public void resetValue(int node) {
-        possibleValues.put(node, new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)));
+        Set<Integer>possible = new HashSet<>();
+        for (int val = 1; val <= size; val++){
+            possible.add(val);
+        }
+
+        possibleValues.put(node, possible);
     }
+    
 }
