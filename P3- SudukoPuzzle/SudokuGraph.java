@@ -3,78 +3,75 @@
 // Keep track of valid possible values and update dynamically as assigning values
 // Apply graph traversal algorithms (BFS or DLS) to search for solutions 
 
-
 import java.util.*;
 
 public class SudokuGraph {
-    private final int size; // Size of the grid (9 for standard Sudoku)
-    private final Map<Integer, Set<Integer>> adjacencyList; // Graph representation
-    private final Map<Integer, Set<Integer>> possibleValues; // Possible values for each node
+    private int gridSize; // 9 for 9x9, 16 for 16x16, etc.
+    private int subGridSize; // 3 for 9x9, 4 for 16x16, etc.
+    private int[] board; // The current state of the board
 
-    public SudokuGraph(int size) {
-        this.size = size;
-        this.adjacencyList = new HashMap<>();
-        this.possibleValues = new HashMap<>();
-        initializeGraph();
+    public SudokuGraph(int gridSize) {
+        this.gridSize = gridSize;
+        this.subGridSize = (int) Math.sqrt(gridSize);
+        this.board = new int[gridSize * gridSize]; // Initialize an empty board
     }
 
-    private void initializeGraph() {
-        // Initialize nodes and their connections
-        for (int i = 0; i < size * size; i++) {
-            adjacencyList.put(i, new HashSet<>());
-            possibleValues.put(i, new HashSet<>());
-            for (int val= 1; val<= size; val++) {
-                possibleValues.get(i).add(val); //all values are possible (initially)
-            
+    // Method to set the board state
+    public void setBoardState(int[] initialState) {
+        if (initialState.length != board.length) {
+            throw new IllegalArgumentException("Invalid board size.");
+        }
+        this.board = initialState.clone();
+    }
+
+    // Get possible values for a cell
+    public List<Integer> getPossibleValues(int cellIndex) {
+        Set<Integer> possibleValues = new HashSet<>();
+        for (int i = 1; i <= gridSize; i++) {
+            possibleValues.add(i);
+        }
+
+        // Remove values in the same row, column, and sub-grid
+        for (int neighbor : getRelatedCells(cellIndex)) {
+            possibleValues.remove(board[neighbor]);
+        }
+
+        return new ArrayList<>(possibleValues);
+    }
+
+    // Get indices of related cells (row, column, sub-grid)
+    public List<Integer> getRelatedCells(int cellIndex) {
+        Set<Integer> related = new HashSet<>();
+
+        int row = cellIndex / gridSize;
+        int col = cellIndex % gridSize;
+
+        // Add row indices
+        for (int c = 0; c < gridSize; c++) {
+            related.add(row * gridSize + c);
+        }
+
+        // Add column indices
+        for (int r = 0; r < gridSize; r++) {
+            related.add(r * gridSize + col);
+        }
+
+        // Add sub-grid indices
+        int subGridRowStart = (row / subGridSize) * subGridSize;
+        int subGridColStart = (col / subGridSize) * subGridSize;
+        for (int r = subGridRowStart; r < subGridRowStart + subGridSize; r++) {
+            for (int c = subGridColStart; c < subGridColStart + subGridSize; c++) {
+                related.add(r * gridSize + c);
             }
         }
 
-        // Create edges based on Sudoku rules
-        for (int i = 0; i < size * size; i++) {
-            int row = i / size, col = i % size;
+        // Exclude the current cell (optional)
+        related.remove(cellIndex);
 
-            // Same row and column
-            for (int j = 0; j < size; j++) {
-                if (j != col) adjacencyList.get(i).add(row * size + j); // Same row
-                if (j != row) adjacencyList.get(i).add(j * size + col); // Same column
-            }
-
-            // Same sub-grid (sqrt(size)xsqrt(size))
-            int subGridSize = (int) Math.sqrt(size);
-            int startRow= (row / subGridSize) * subGridSize, startCol = (col / subGridSize) *subGridSize;
-            for (int r = startRow; r < startRow + subGridSize; r++) {
-                for (int c = startCol; c < startCol + subGridSize; c++) {
-                    int node = r * size + c;
-                    if (node != i) adjacencyList.get(i).add(node);
-                }
-            }
-        }
+        return new ArrayList<>(related);
     }
-
-    public Set<Integer> getNeighbors(int node) {
-        return adjacencyList.get(node);
+    // Method to get the grid size
+    public int getSize() {
+        return this.gridSize;
     }
-
-    public Set<Integer> getPossibleValues(int node) {
-        return possibleValues.get(node);
-    }
-
-    public void setValue(int node, int value) {
-        possibleValues.get(node).clear();
-        possibleValues.get(node).add(value);
-
-        for (int neighbor : adjacencyList.get(node)) {
-            possibleValues.get(neighbor).remove(value);
-        }
-    }
-
-    public void resetValue(int node) {
-        Set<Integer>possible = new HashSet<>();
-        for (int val = 1; val <= size; val++){
-            possible.add(val);
-        }
-
-        possibleValues.put(node, possible);
-    }
-    
 }
