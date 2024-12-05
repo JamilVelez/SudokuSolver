@@ -14,10 +14,10 @@ public class Main {
                 System.out.println("Puzzle " + (i + 1) + ":");
                 printPuzzle(puzzles.get(i)); // Print the puzzle before solving
 
-                int size = (int) Math.sqrt(puzzles.get(i).length); //calculate grid size (Dynamically)
+                int size = (int) Math.sqrt(puzzles.get(i).length); // Calculate grid size (Dynamically)
 
                 // Create a Sudoku graph for the puzzle
-                SudokuGraph graph = new SudokuGraph(size);  //create graph for variable grid sizes
+                SudokuGraph graph = new SudokuGraph(size);  // Create graph for variable grid sizes
                 
                 for (int j = 0; j < puzzles.get(i).length; j++) {
                     if (puzzles.get(i)[j] != 0) {
@@ -43,7 +43,10 @@ public class Main {
 
                 // Solve the puzzle with DLS
                 System.out.println("\nSolving with DLS...");
-                int depthLimit = 81;  // Set a depth limit for DLS
+                
+                // Dynamically calculate the depth limit based on grid size
+                int depthLimit = size * size;  // size is the grid size (e.g., 9 for 9x9, 4 for 4x4, etc.)
+                
                 long dlsStart = System.nanoTime();
                 List<int[]> dlsSolutions = SudokuSolverDLS.solve(graph, depthLimit); // DLS solver
                 long dlsEnd = System.nanoTime();
@@ -109,7 +112,7 @@ public class Main {
 
     // Method to print the Sudoku puzzle in a readable format
     private static void printPuzzle(int[] puzzle) {
-        int size = (int) Math.sqrt(puzzle.length); //calculate grid size(dynamically)
+        int size = (int) Math.sqrt(puzzle.length); // Calculate grid size (dynamically)
         for (int i = 0; i < puzzle.length; i++) {
             System.out.print((puzzle[i] == 0 ? "." : puzzle[i]) + " ");
             if ((i + 1) % size == 0) System.out.println();
