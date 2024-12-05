@@ -3,11 +3,13 @@ import java.util.*;
 public class SudokuSolverBFS {
 
     public static List<int[]> solve(SudokuGraph graph) {
+        int gridSize = graph.getSize(); // Get grid size dynamically from graph
+
         Queue<int[]> queue = new LinkedList<>();
         Set<String> visited = new HashSet<>(); // To track visited board states
         List<int[]> solutions = new ArrayList<>(); // To store all valid solutions
         
-        int[] initialBoard = new int[81]; // Start with an empty board (0s for empty cells)
+        int[] initialBoard = new int[gridSize * gridSize]; // Use gridSize to initialize the board correctly
         
         queue.add(initialBoard);
         visited.add(Arrays.toString(initialBoard)); // Add the initial state to visited list
@@ -65,4 +67,5 @@ public class SudokuSolverBFS {
         }
         return true; // If no conflict, the move is valid
     }
+
 }
