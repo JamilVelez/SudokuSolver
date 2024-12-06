@@ -3,11 +3,35 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        String filePath = "BigPuzzle.txt"; // Path to your puzzle file
-        //String filePath = "SudokuPuzzles.txt"; // Path to your puzzle file
+        Scanner scanner = new Scanner(System.in);
+
+        // Prompt user for puzzle size
+        System.out.println("Select the type of Sudoku puzzle to solve:");
+        System.out.println("1. 9x9");
+        System.out.println("2. 16x16");
+        System.out.println("3. 25x25");
+        System.out.print("Enter your choice (1/2/3): ");
+        int choice = scanner.nextInt();
+
+        // Map user choice to the appropriate file
+        String filePath;
+        switch (choice) {
+            case 1:
+                filePath = "SudokuPuzzles.txt"; // 9x9 puzzle file
+                break;
+            case 2:
+                filePath = "BigPuzzle.txt"; // 16x16 puzzle file
+                break;
+            case 3:
+                filePath = "25x25Sudoku.txt"; // 25x25 puzzle file
+                break;
+            default:
+                System.out.println("Invalid choice. Exiting...");
+                return;
+        }
 
         try {
-            // Read Sudoku puzzles from file
+            // Read Sudoku puzzles from the selected file
             List<int[]> puzzles = readSudokuPuzzles(filePath);
 
             // Loop through each puzzle
@@ -20,8 +44,8 @@ public class Main {
                 System.out.println("Grid size: " + gridSize + "x" + gridSize);
 
                 // Create a Sudoku graph for the puzzle
-                SudokuGraph graph = new SudokuGraph(gridSize);  // Create graph for variable grid sizes
-                
+                SudokuGraph graph = new SudokuGraph(gridSize); // Create graph for variable grid sizes
+
                 // Set the initial puzzle values in the graph
                 graph.setBoardState(puzzles.get(i)); // Set the board state using setBoardState
 
@@ -34,7 +58,7 @@ public class Main {
 
                 // Solve the puzzle with DLS
                 System.out.println("\n>>>> Solving with DLS...");
-                int depthLimit = gridSize * gridSize;  // Set the depth limit based on grid size
+                int depthLimit = gridSize * gridSize; // Set the depth limit based on grid size
                 long dlsStart = System.nanoTime();
                 List<int[]> dlsSolutions = SudokuSolverDLS.solve(graph, depthLimit); // DLS solver
                 long dlsEnd = System.nanoTime();
@@ -53,7 +77,7 @@ public class Main {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             List<Integer> currentPuzzle = new ArrayList<>();
-    
+
             while ((line = br.readLine()) != null) {
                 line = line.trim(); // Remove any leading or trailing whitespace
                 if (line.isEmpty()) {
@@ -80,7 +104,7 @@ public class Main {
                     }
                 }
             }
-    
+
             // Add the last puzzle if it wasn't followed by a blank line
             if (!currentPuzzle.isEmpty()) {
                 puzzles.add(convertToPuzzleArray(currentPuzzle));
@@ -89,7 +113,7 @@ public class Main {
         return puzzles;
     }
 
-    // Helper method to convert List<Integer> to int[] (array)
+    // Helper method to convert List<Integer> to int[]
     private static int[] convertToPuzzleArray(List<Integer> currentPuzzle) {
         int[] puzzleArray = new int[currentPuzzle.size()];
         for (int i = 0; i < currentPuzzle.size(); i++) {
