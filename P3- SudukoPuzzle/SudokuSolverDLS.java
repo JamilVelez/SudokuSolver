@@ -1,3 +1,8 @@
+/*
+Wafae Benkassou, Riley Rutigliano, Jamil Velez
+11/19/24
+DLS Method to be used by Main.java to solve a Sudoku using Depth-Limited Search.
+ */
 import java.util.*;
 
 public class SudokuSolverDLS {

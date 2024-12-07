@@ -1,7 +1,9 @@
-// Graph to Solve Suduko
-// Why use this? Because it can easily model the relationship between nodes
-// Keep track of valid possible values and update dynamically as assigning values
-// Apply graph traversal algorithms (BFS or DLS) to search for solutions 
+/*
+Wafae Benkassou, Riley Rutigliano, Jamil Velez
+11/19/24
+Graph that models the relationship between nodes, keeps track of valid values and updates dynamically as assigning
+values. It applies graph traversal algorithms (BFS or DLS) to search for solutions.
+ */
 
 import java.util.*;
 

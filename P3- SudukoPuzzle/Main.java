@@ -1,3 +1,16 @@
+/*
+Wafae Benkassou, Riley Rutigliano, Jamil Velez
+11/19/24
+Program 3 - Sudoku Puzzle
+Program that will solve sudoku puzzles fed into it using Breadth First Search and Depth Limited Search
+ */
+
+/*
+Lina, Tirsa Ninia, and Matheus Supriyanto Rumetna. “Comparison Analysis of Breadth First Search and Depth Limited Search Algorithms in Sudoku Game.”
+Bulletin of Computer Science and Electrical Engineering, vol. 2, no. 2, 2021, pp. 74–83.
+https://www.researchgate.net/publication/358642884_Comparison_Analysis_of_Breadth_First_Search_and_Depth_Limited_Search_Algorithms_in_Sudoku_Game
+ */
+
 import java.io.*;
 import java.util.*;
 

@@ -1,3 +1,9 @@
+/*
+Wafae Benkassou, Riley Rutigliano, Jamil Velez
+11/19/24
+BFS Method to be used by Main.java to solve a Sudoku using Breadth-First Search.
+ */
+
 import java.util.*;
 
 public class SudokuSolverBFS {
